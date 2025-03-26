@@ -96,8 +96,13 @@ export default async (req: Request, context: Context) => {
     // Make sure "clipped" only appears once in the tags array
     metadataWithTags.tags = [...new Set(metadataWithTags.tags)];
     
+    // Format tags array in YAML as [one, two, three]
+    const yamlOptions = {
+      flowLevel: 1 // This makes arrays use flow style [one, two, three]
+    };
+    
     // Create YAML frontmatter
-    const frontmatter = yaml.dump(metadataWithTags);
+    const frontmatter = yaml.dump(metadataWithTags, yamlOptions);
     
     // Create markdown content with YAML frontmatter
     const markdownContent = `---
@@ -105,7 +110,7 @@ ${frontmatter}---
 
 # ${metadataWithTags.title}
 
-${metadataWithTags.description || ''}
+${metadataWithTags.description}
 
 [Visit Original Link](${metadataWithTags.url})
 `;

@@ -35,11 +35,11 @@ async function fetchPageMetadata(url: string): Promise<MetaData | null> {
 
         // Extract description from meta tag
         const descriptionMeta = document.querySelector('meta[name="description"]');
-        const description = descriptionMeta ? descriptionMeta.getAttribute('content') : '';
+        const description = descriptionMeta ? descriptionMeta.getAttribute('content') || '' : '';
 
         // Extract meta image from og:image
         const metaImageMeta = document.querySelector('meta[property="og:image"]');
-        const image = metaImageMeta ? metaImageMeta.getAttribute('content') : '';
+        const image = metaImageMeta ? metaImageMeta.getAttribute('content') || '' : '';
 
         // Return extracted metadata
         return { title, description, image, url };
