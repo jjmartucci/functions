@@ -85,25 +85,23 @@ export default async (req: Request, context: Context) => {
       auth: githubToken
     });
     
-    // Ensure metadata has an ID
-    const metadataWithId: MetaData = metadata.id ? metadata : { ...metadata, id: uuidv4() };
-    
+
     // Create YAML frontmatter
-    const frontmatter = yaml.dump(metadataWithId);
+    const frontmatter = yaml.dump(metadata);
     
     // Create markdown content with YAML frontmatter
     const markdownContent = `---
 ${frontmatter}---
 
-# ${metadataWithId.title}
+# ${metadata.title}
 
-${metadataWithId.description || ''}
+${metadata.description || ''}
 
-[Visit Original Link](${metadataWithId.url})
+[Visit Original Link](${metadata.url})
 `;
     
     // Create a filename-safe version of the title
-    const safeFilename = metadataWithId.title
+    const safeFilename = metadata.title
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-') // Replace non-alphanumeric chars with hyphens
       .replace(/^-+|-+$/g, '')     // Remove leading/trailing hyphens
@@ -135,7 +133,7 @@ ${metadataWithId.description || ''}
       owner,
       repo,
       path: filePath,
-      message: `Add or update link: ${metadataWithId.title}`,
+      message: `Add or update link: ${metadata.title}`,
       content: Buffer.from(markdownContent).toString('base64'),
       branch,
       ...(sha ? { sha } : {})
@@ -143,7 +141,7 @@ ${metadataWithId.description || ''}
     
     return new Response(JSON.stringify({
       success: true,
-      metadata: metadataWithId,
+      metadata: metadata,
       github: {
         url: `https://github.com/${owner}/${repo}/blob/${branch}/${filePath}`,
         commit: response.data.commit.sha
