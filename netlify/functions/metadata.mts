@@ -63,11 +63,35 @@ async function fetchPageMetadata(url: string): Promise<MetaData | null> {
 
 export default async (req: Request, context: Context) => {
     console.log(`function req: ${JSON.stringify(req)}`)
-    fetchPageMetadata(req.url).then(metaData => {
-        console.log(metadata)
+    
+    // Extract the URL from query parameters
+    const url = new URL(req.url).searchParams.get('url');
+    
+    try {
+        const metaData = await fetchPageMetadata(url);
+        console.log(metaData);
+        
         if (metaData) {
+            return new Response(JSON.stringify(metaData), {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+        } else {
+            return new Response(JSON.stringify({ error: "Failed to fetch metadata" }), {
+                status: 400,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
         }
-    });
-    return new Response("hello world")
-
+    } catch (error) {
+        console.error('Error in metadata function:', error);
+        return new Response(JSON.stringify({ error: "Internal server error" }), {
+            status: 500,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+    }
 }
