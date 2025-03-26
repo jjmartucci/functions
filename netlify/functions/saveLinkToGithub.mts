@@ -101,8 +101,15 @@ ${metadataWithId.description || ''}
 [Visit Original Link](${metadataWithId.url})
 `;
     
+    // Create a filename-safe version of the title
+    const safeFilename = metadataWithId.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-') // Replace non-alphanumeric chars with hyphens
+      .replace(/^-+|-+$/g, '')     // Remove leading/trailing hyphens
+      .substring(0, 100);          // Limit length
+    
     // File path in the repository
-    const filePath = `links/${metadataWithId.id}.md`;
+    const filePath = `links/${safeFilename}.md`;
     
     // Check if file already exists
     let sha;
