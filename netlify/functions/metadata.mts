@@ -4,7 +4,7 @@ import fetch from 'node-fetch';
 import { JSDOM } from 'jsdom';
 
 interface MetaData {
-    pageTitle: string, pageDescription: string, pageMetaImage: string
+    title: string, description: string, image: string, url: string
 }
 
 async function fetchPageMetadata(url: string): Promise<MetaData | null> {
@@ -39,20 +39,10 @@ async function fetchPageMetadata(url: string): Promise<MetaData | null> {
 
         // Extract meta image from og:image
         const metaImageMeta = document.querySelector('meta[property="og:image"]');
-        const metaImage = metaImageMeta ? metaImageMeta.getAttribute('content') : '';
-
-        // Output the results
-        console.log('Title:', title);
-        console.log('Description:', description);
-        console.log('Meta Image:', metaImage);
-
-        // You can also assign them to variables if needed
-        const pageTitle = title;
-        const pageDescription = description;
-        const pageMetaImage = metaImage;
+        const image = metaImageMeta ? metaImageMeta.getAttribute('content') : '';
 
         // Return extracted metadata
-        return { pageTitle, pageDescription, pageMetaImage };
+        return { title, description, image, url };
 
     } catch (error) {
         console.error('Error fetching page metadata:', error);
