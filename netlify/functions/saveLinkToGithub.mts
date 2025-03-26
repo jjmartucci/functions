@@ -11,6 +11,7 @@ interface MetaData {
   url: string;
 }
 
+const LINK_PATH = `src/content/links/`
 export default async (req: Request, context: Context) => {
   // Define common headers for all responses
   const headers = {
@@ -109,7 +110,7 @@ ${metadataWithId.description || ''}
       .substring(0, 100);          // Limit length
     
     // File path in the repository
-    const filePath = `links/${safeFilename}.md`;
+    const filePath = `${LINK_PATH}/${safeFilename}.md`;
     
     // Check if file already exists
     let sha;
