@@ -9,6 +9,7 @@ interface MetaData {
   description: string;
   image: string;
   url: string;
+  tags: string[];
 }
 
 const LINK_PATH = `src/content/links/`
@@ -86,22 +87,31 @@ export default async (req: Request, context: Context) => {
     });
     
 
+    // Ensure metadata has tags array with "clipped"
+    const metadataWithTags = {
+      ...metadata,
+      tags: [...(metadata.tags || []), "clipped"]
+    };
+    
+    // Make sure "clipped" only appears once in the tags array
+    metadataWithTags.tags = [...new Set(metadataWithTags.tags)];
+    
     // Create YAML frontmatter
-    const frontmatter = yaml.dump(metadata);
+    const frontmatter = yaml.dump(metadataWithTags);
     
     // Create markdown content with YAML frontmatter
     const markdownContent = `---
 ${frontmatter}---
 
-# ${metadata.title}
+# ${metadataWithTags.title}
 
-${metadata.description || ''}
+${metadataWithTags.description || ''}
 
-[Visit Original Link](${metadata.url})
+[Visit Original Link](${metadataWithTags.url})
 `;
     
     // Create a filename-safe version of the title
-    const safeFilename = metadata.title
+    const safeFilename = metadataWithTags.title
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-') // Replace non-alphanumeric chars with hyphens
       .replace(/^-+|-+$/g, '')     // Remove leading/trailing hyphens
@@ -133,7 +143,7 @@ ${metadata.description || ''}
       owner,
       repo,
       path: filePath,
-      message: `Add or update link: ${metadata.title}`,
+      message: `Add or update link: ${metadataWithTags.title}`,
       content: Buffer.from(markdownContent).toString('base64'),
       branch,
       ...(sha ? { sha } : {})
@@ -141,7 +151,7 @@ ${metadata.description || ''}
     
     return new Response(JSON.stringify({
       success: true,
-      metadata: metadata,
+      metadata: metadataWithTags,
       github: {
         url: `https://github.com/${owner}/${repo}/blob/${branch}/${filePath}`,
         commit: response.data.commit.sha
