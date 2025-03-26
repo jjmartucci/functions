@@ -59,9 +59,9 @@ export default async (req: Request, context: Context) => {
         headers
       });
     }
-    
+    console.log(context)
     // Step 1: Call metadata function to get metadata
-    const metadataResponse = await fetch(`${context.site.url}/.netlify/functions/metadata`, {
+    const metadataResponse = await fetch(`${context.url.origin}/.netlify/functions/metadata`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -84,7 +84,7 @@ export default async (req: Request, context: Context) => {
     const metadata = await metadataResponse.json();
     
     // Step 2: Call saveLinkToGithub function with the metadata
-    const saveResponse = await fetch(`${context.site.url}/.netlify/functions/saveLinkToGithub`, {
+    const saveResponse = await fetch(`${context.url.origin}/.netlify/functions/saveLinkToGithub`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
