@@ -110,7 +110,7 @@ ${metadataWithId.description || ''}
       .substring(0, 100);          // Limit length
     
     // File path in the repository
-    const filePath = `${LINK_PATH}/${safeFilename}.md`;
+    const filePath = `${LINK_PATH}${safeFilename}.md`;
     
     // Check if file already exists
     let sha;
