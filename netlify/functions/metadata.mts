@@ -64,34 +64,66 @@ async function fetchPageMetadata(url: string): Promise<MetaData | null> {
 export default async (req: Request, context: Context) => {
     console.log(`function req: ${JSON.stringify(req)}`)
     
-    // Extract the URL from query parameters
-    const url = new URL(req.url).searchParams.get('url');
-
+    // Define common headers for all responses
+    const headers = {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type'
+    };
+    
+    // Handle OPTIONS request for CORS preflight
+    if (req.method === 'OPTIONS') {
+        return new Response(null, { headers, status: 204 });
+    }
+    
+    // Check if it's a POST request
+    if (req.method !== 'POST') {
+        return new Response(JSON.stringify({ 
+            error: "Method not allowed", 
+            message: "This endpoint only accepts POST requests" 
+        }), {
+            status: 405,
+            headers
+        });
+    }
+    
     try {
+        // Extract URL from request body
+        const body = await req.json();
+        const url = body.url;
+        
+        if (!url) {
+            return new Response(JSON.stringify({ 
+                error: "Missing URL", 
+                message: "Please provide a 'url' property in the request body" 
+            }), {
+                status: 400,
+                headers
+            });
+        }
+        
         const metadata = await fetchPageMetadata(url);
-
         
         if (metadata) {
-            return new Response(JSON.stringify(metadata), {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
+            return new Response(JSON.stringify(metadata), { headers });
         } else {
-            return new Response(JSON.stringify({ error: "Failed to fetch metadata" }), {
+            return new Response(JSON.stringify({ 
+                error: "Failed to fetch metadata",
+                message: "Could not retrieve metadata for the provided URL" 
+            }), {
                 status: 400,
-                headers: {
-                    'Content-Type': 'application/json'
-                }
+                headers
             });
         }
     } catch (error) {
         console.error('Error in metadata function:', error);
-        return new Response(JSON.stringify({ error: "Internal server error" }), {
+        return new Response(JSON.stringify({ 
+            error: "Internal server error",
+            message: error instanceof Error ? error.message : "Unknown error occurred"
+        }), {
             status: 500,
-            headers: {
-                'Content-Type': 'application/json'
-            }
+            headers
         });
     }
 }
