@@ -8,6 +8,9 @@ interface MetaData {
 }
 
 async function fetchPageMetadata(url: string): Promise<MetaData | null> {
+    if(!url) {
+        return null;
+    }
     try {
         // Fetch the HTML content of the URL
         const response = await fetch(url, {
@@ -59,11 +62,12 @@ async function fetchPageMetadata(url: string): Promise<MetaData | null> {
 
 
 export default async (req: Request, context: Context) => {
-    console.log(`function req: ${req}`)
+    console.log(`function req: ${JSON.stringify(req)}`)
     fetchPageMetadata(req.url).then(metaData => {
+        console.log(metadata)
         if (metaData) {
-            return new Response(JSON.stringify(metaData))
         }
     });
+    return new Response("hello world")
 
 }
