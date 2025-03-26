@@ -79,9 +79,21 @@ export default async (req: Request, context: Context) => {
     }
     
     try {
-        // Extract URL from request body
+        // Extract data from request body
         const body = await req.json();
-        const url = body.url;
+        const { url, API_KEY } = body;
+        
+        // Check API key
+        const expectedApiKey = process.env.API_KEY;
+        if (!API_KEY || API_KEY !== expectedApiKey) {
+            return new Response(JSON.stringify({ 
+                error: "Unauthorized", 
+                message: "Invalid or missing API key" 
+            }), {
+                status: 401,
+                headers
+            });
+        }
         
         if (!url) {
             return new Response(JSON.stringify({ 
