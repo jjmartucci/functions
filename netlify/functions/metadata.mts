@@ -66,13 +66,13 @@ export default async (req: Request, context: Context) => {
     
     // Extract the URL from query parameters
     const url = new URL(req.url).searchParams.get('url');
-    
+
     try {
-        const metaData = await fetchPageMetadata(url);
-        console.log(metaData);
+        const metadata = await fetchPageMetadata(url);
+
         
-        if (metaData) {
-            return new Response(JSON.stringify(metaData), {
+        if (metadata) {
+            return new Response(JSON.stringify(metadata), {
                 headers: {
                     'Content-Type': 'application/json'
                 }
